@@ -6,23 +6,30 @@ const AuthForm = () => {
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
   const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
   };
 
   const submitHandler = (event) => {
-    event.preventDefaultl();
-
+    event.preventDefault();
+    // console.log('this is working')
     const enteredEmail = emailInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
 
     //optional: Add validation
 
+    setIsLoading(true);
+    let url;
     if (isLogin) {
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDLvsMQz4ZW3aR84MRmSj5G3xCuUvvBkzE";
     } else {
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDLvsMQz4ZW3aR84MRmSj5G3xCuUvvBkzE";
       fetch(
-        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDLvsMQz4ZW3aR84MRmSj5G3xCuUvvBkzE",
+        url,
         {
           method: "POST",
           body: JSON.stringify({
@@ -35,12 +42,16 @@ const AuthForm = () => {
           },
         }
       ).then((res) => {
+        setIsLoading(false);
         if (res.ok) {
-          // ...
+          return res.json();
         } else {
           return res.json().then((data) => {
-            //show error modal
-            console.log(data);
+            let errorMessage = "Authentication failed";
+            // if (data && data.error && data.error.message) {
+            //   errorMessage = data.error.message;
+            // }
+            alert(errorMessage);
           });
         }
       });
@@ -65,7 +76,10 @@ const AuthForm = () => {
           />
         </div>
         <div className={classes.actions}>
-          <button>{isLogin ? "Login" : "Create Account"}</button>
+          {!isLoading && (
+            <button>{isLogin ? "Login" : "Create Account"}</button>
+          )}
+          {isLoading && <p>Sending Request</p>}
           <button
             type="button"
             className={classes.toggle}
