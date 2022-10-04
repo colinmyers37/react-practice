@@ -52,9 +52,12 @@ const AuthForm = () => {
             //   errorMessage = data.error.message;
             // }
             alert(errorMessage);
+            throw new Error(errorMessage)
           });
         }
-      });
+      }).then(data => {}).catch(err => {
+        
+      })
     }
   };
 
